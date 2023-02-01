@@ -9,11 +9,10 @@ RUN apt-get update && apt-get install --yes \
 RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-py38_4.9.2-Linux-x86_64.sh -O miniconda.sh \
     # Conda must be installed at /databricks/conda
     && /bin/bash miniconda.sh -b -p /databricks/conda \
-    && rm miniconda.sh
+    && rm miniconda.sh \
+    && /databricks/conda/bin/conda update conda \
+    && /databricks/conda/bin/conda install conda-libmamba-solver
 
-FROM databricksruntime/minimal:9.x
-
-COPY --from=builder /databricks/conda /databricks/conda
 
 COPY env.yml /databricks/.conda-env-def/env.yml
 
@@ -24,7 +23,12 @@ RUN /databricks/conda/bin/conda env create --file /databricks/.conda-env-def/env
 # Conda recommends using strict channel priority speed up conda operations and reduce package incompatibility problems.
 # Set always_yes to avoid needing -y flags, and improve conda experience in Databricks notebooks.
 RUN /databricks/conda/bin/conda config --system --set channel_priority strict \
-    && /databricks/conda/bin/conda config --system --set always_yes True
+    && /databricks/conda/bin/conda config --system --set always_yes True \
+    && /databricks/conda/bin/conda config --system --add channels conda-forge
+
+FROM databricksruntime/minimal:9.x
+
+COPY --from=builder /databricks/conda /databricks/conda
 
 # This environment variable must be set to indicate the conda environment to activate.
 # Note that currently, we have to set both of these environment variables. The first one is necessary to indicate that this runtime supports conda.
