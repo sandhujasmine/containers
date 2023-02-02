@@ -1,0 +1,15 @@
+name: dcs-minimal
+channels:
+  - default
+  - conda-forge
+dependencies:
+  - python
+  - pip=20.2.4
+  - six
+  - ipython
+  - nomkl
+  - numpy
+  - pandas
+  - traitlets
+  - wheel
+  - pyarrow
