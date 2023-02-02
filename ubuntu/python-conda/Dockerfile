@@ -24,7 +24,7 @@ RUN /databricks/conda/bin/conda env create --file /databricks/.conda-env-def/env
 # Set always_yes to avoid needing -y flags, and improve conda experience in Databricks notebooks.
 RUN /databricks/conda/bin/conda config --system --set channel_priority strict \
     && /databricks/conda/bin/conda config --system --set always_yes True \
-    && /databricks/conda/bin/conda config --system --add channels conda-forge
+    && /databricks/conda/bin/conda config --system --append channels conda-forge
 
 FROM databricksruntime/minimal:9.x
 
