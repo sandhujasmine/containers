@@ -10,13 +10,13 @@ RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-py38_4.9.2-Linux-x86_
     # Conda must be installed at /databricks/conda
     && /bin/bash miniconda.sh -b -p /databricks/conda \
     && rm miniconda.sh \
-    && /databricks/conda/bin/conda -n base update conda \
-    && /databricks/conda/bin/conda install conda-libmamba-solver
+    && /databricks/conda/bin/conda update conda
 
+ARG ENV=anaconda
+ARG PKGS=pinned_pkgs.txt
 
-#COPY env.yml /databricks/.conda-env-def/env.yml
-
-RUN /databricks/conda/bin/conda create -n anaconda anaconda \
+COPY ${PKGS} /databricks/.conda-env-def/pkgs.txt
+RUN /databricks/conda/bin/conda create -n ${ENV} --file /databricks/.conda-env-def/pkgs.txt \
     # Source conda.sh for all login shells.
     && ln -s /databricks/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
 
@@ -24,15 +24,15 @@ RUN /databricks/conda/bin/conda create -n anaconda anaconda \
 # Set always_yes to avoid needing -y flags, and improve conda experience in Databricks notebooks.
 RUN /databricks/conda/bin/conda config --system --set channel_priority strict \
     && /databricks/conda/bin/conda config --system --set always_yes True \
-    && /databricks/conda/bin/conda config --system --add channels conda-forge
+    && /databricks/conda/bin/conda config --system --append channels conda-forge
 
-#FROM databricksruntime/minimal:9.x
-FROM databricksruntime/standard:latest
+FROM databricksruntime/minimal:11.3-LTS
 
 COPY --from=builder /databricks/conda /databricks/conda
+ARG ENV
 
 # This environment variable must be set to indicate the conda environment to activate.
 # Note that currently, we have to set both of these environment variables. The first one is necessary to indicate that this runtime supports conda.
 # The second one is necessary so that the python notebook/repl can be started (won't work without it)
-ENV DEFAULT_DATABRICKS_ROOT_CONDA_ENV=anaconda
-ENV DATABRICKS_ROOT_CONDA_ENV=anaconda
+ENV DEFAULT_DATABRICKS_ROOT_CONDA_ENV=${ENV}
+ENV DATABRICKS_ROOT_CONDA_ENV=${ENV}
