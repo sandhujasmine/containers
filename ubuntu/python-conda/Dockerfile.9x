@@ -26,7 +26,7 @@ RUN /databricks/conda/bin/conda config --system --set channel_priority strict \
     && /databricks/conda/bin/conda config --system --set always_yes True \
     && /databricks/conda/bin/conda config --system --append channels conda-forge
 
-FROM databricksruntime/minimal:11.3-LTS
+FROM databricksruntime/minimal:9x
 
 COPY --from=builder /databricks/conda /databricks/conda
 ARG ENV
