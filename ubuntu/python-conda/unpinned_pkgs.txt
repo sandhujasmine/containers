@@ -1,0 +1,11 @@
+python=3.8.8
+pip=20.2.4
+six
+ipython
+nomkl
+numpy
+pandas
+traitlets
+wheel
+pyarrow
+astropy
